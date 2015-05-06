@@ -65,15 +65,22 @@ class Table extends Component {
     }
 
     private function update() {
+        $result = array('success' => false);
+        $params = $this->values($_GET);
     	$values = $this->values($_POST);
-    	$qry = 'UPDATE ' . $this->table . ' SET ' . implode(', ', $values) . ' WHERE id=' . $this->id;
-    	$result = array('success' => (bool) DB::exec($qry));
-    	if ($result['success']) $result['id'] = $this->id;
+        $object = MongoDB::getInstance()->{$this->table}->findOne($params);
+    	$update = MongoDB::getInstance()->{$this->table}->update($_GET, $values);
+    	if (!empty($update->errmsg)) $result['result'] = $update->errmsg;
+        else {
+            $result['success'] = (bool) $update['ok'];
+            if ($result['success']) $result['_id'] = $object['_id']->{'$id'};
+        }
     	return $result;
     }
 
     private function delete() {
-        $remove = MongoDB::getInstance()->{$this->table}->remove($_GET);
+        $params = $this->values($_GET);
+        $remove = MongoDB::getInstance()->{$this->table}->remove($params);
     	$result = array('success' => (bool) $remove);
     	return $result;
     }
@@ -89,6 +96,7 @@ class Table extends Component {
             else if (is_array($value)) $values[$key] = $this->values($value);
             else if ($key == 'date' || $key == 'expire' || $key == 'time') $values[$key] = new \MongoDate($value);
             else if (is_int($value)) $values[$key] = (int) $value;
+            //else if ($key == 'set') $values['$set'] = $value;
             else $values[$key] = $value;
     	}
     	return $values;
