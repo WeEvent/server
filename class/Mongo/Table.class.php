@@ -55,6 +55,9 @@ class Table extends Component {
     private function insert() {
         $result = array('success' => false);
     	$values = $this->values($_POST);
+	//file_put_contents('log.txt', 'test ');
+	//file_put_contents('log.txt', $_POST.' ' , FILE_APPEND);
+	//file_put_contents('log.txt', $values, FILE_APPEND);
     	$new = MongoDB::getInstance()->{$this->table}->insert($values);
         if (!empty($new->errmsg)) $result['result'] = $new->errmsg;
         else {
@@ -87,13 +90,14 @@ class Table extends Component {
 
     private function values($data) {
     	$values = array();
+	//file_put_contents('log.txt', $values);
     	foreach ($data as $key => $value) {
             if (empty($value) && strpos($key, '>') !== false) {
                 list($key, $value) = explode('>', $key);
                 $values[$key] = array('$gt' => $value);
             }
             else if ($key == '_id') $values['_id'] = new \MongoId($value);
-            else if (is_array($value)) $values[$key] = $this->values($value);
+	    //else if (is_array($value)) $values[$key] = $this->values($value);
             else if ($key == 'date' || $key == 'expire' || $key == 'time') $values[$key] = new \MongoDate($value);
             else if (is_int($value)) $values[$key] = (int) $value;
             //else if ($key == 'set') $values['$set'] = $value;
