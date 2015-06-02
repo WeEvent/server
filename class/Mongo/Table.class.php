@@ -47,7 +47,10 @@ class Table extends Component {
     private function load() {
         $result = array();
         $values = $this->values($_GET);
-    	$cursor = MongoDB::getInstance()->{$this->table}->find($values);
+        if ($_POST != null)
+    	   $cursor = MongoDB::getInstance()->{$this->table}->find($values, $_POST);
+        else
+            $cursor = MongoDB::getInstance()->{$this->table}->find($values);
         foreach ($cursor as $row) $result[] = $this->parseRow($row);
 		return array('success' => true, 'result' => $result);
     }
