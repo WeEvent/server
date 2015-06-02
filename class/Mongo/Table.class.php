@@ -47,8 +47,8 @@ class Table extends Component {
     private function load() {
         $result = array();
         $values = $this->values($_GET);
-        if (!empty($_GET['field']))
-            $cursor = MongoDB::getInstance()->{$this->table}->find($values, array("$_GET['field']" => 1));
+        if (isset($_GET["field"]))
+            $cursor = MongoDB::getInstance()->{$this->table}->find($values, array($_GET["field"] => 1));
         else
             $cursor = MongoDB::getInstance()->{$this->table}->find($values);
         foreach ($cursor as $row) $result[] = $this->parseRow($row);
