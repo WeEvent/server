@@ -47,8 +47,8 @@ class Table extends Component {
     private function load() {
         $result = array();
         $values = $this->values($_GET);
-        if ($_POST != null)
-    	   $cursor = MongoDB::getInstance()->{$this->table}->find($values, $_POST);
+        if (!empty($_GET['field']))
+            $cursor = MongoDB::getInstance()->{$this->table}->find($values, array("$_GET['field']" => 1));
         else
             $cursor = MongoDB::getInstance()->{$this->table}->find($values);
         foreach ($cursor as $row) $result[] = $this->parseRow($row);
@@ -99,7 +99,7 @@ class Table extends Component {
             else if (is_array($value)) $values[$key] = $this->values($value);
             else if ($key == 'date' || $key == 'expire' || $key == 'time') $values[$key] = new \MongoDate($value);
             else if (is_int($value)) $values[$key] = (int) $value;
-            //else if ($key == 'set') $values['$set'] = $value;
+            else if ($key == 'field') ;
             else $values[$key] = $value;
     	}
     	return $values;
